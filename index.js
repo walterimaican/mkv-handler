@@ -87,14 +87,20 @@ const subtitlePrompt = async () => {
 
 (async () => {
     const separator = '========================================';
-    const mainMenu = 
-    `What would you like to do?
-        (e) extract
-        (i) info
-        (m) merge
-        (p) propedit
-        (q) quit
-        \n> `;
+    const extract = '(e) extract\n';
+    const info = '(i) info\n';
+    const merge = '(m) merge\n';
+    const propedit = '(p) propedit\n';
+    const subtitle = '(s) subtitle\n'
+    const quit = '(q) quit\n';
+    const mainMenu = 'What would you like to do?\n'
+    // + extract
+    // + info
+    + merge
+    // + propedit
+    + subtitle
+    + quit
+    + '> ';
 
     let stillUsing = true;
     while (stillUsing) {
@@ -104,18 +110,21 @@ const subtitlePrompt = async () => {
 
         const response = await waitForInput(mainMenu); 
         switch(response) {
-            case 'e':
-                await extractPrompt();
-                break;
-            case 'i':
-                await infoPrompt();
-                break;
+            // case 'e':
+            //     await extractPrompt();
+            //     break;
+            // case 'i':
+            //     await infoPrompt();
+            //     break;
             case 'm':
                 await mergePrompt();
                 break;
-            case 'p':
-                await propEditPrompt();
-                break;    
+            // case 'p':
+            //     await propEditPrompt();
+            //     break;
+            case 's':
+                await subtitlePrompt();
+                break;
             case 'q':
                 console.log('Goodbye.');
                 stillUsing = false;
