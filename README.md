@@ -4,6 +4,8 @@ A simple program to walk a user through various MKV operations. Wraps around [MK
 
 I am adding functionality to it as needed. As a result, this program is far from being a complete wrapper (and most likely will never reach that point).
 
+Feel free to fork this repo and customize as desired as this program is just for my own personal use. For example, see [Issue #1](https://github.com/walterimaican/mkv-handler/issues/1).
+
 # How to Use
 
 This program currently calls various MKVToolNix executables (which means that you need to have these programs already available in your PATH). You will also need to have `subshift` available from the command line as well by running:
