@@ -6,6 +6,8 @@ I am adding functionality to it as needed. As a result, this program is far from
 
 # How to Use
 
+This program currently calls various MKVToolNix executables (which means that you need to have these programs already available in your PATH).
+
 ## Windows 64-bit Users
 
 Download `mkvhandler.exe` and run on your command line.
