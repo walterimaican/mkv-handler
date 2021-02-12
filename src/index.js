@@ -1,3 +1,4 @@
+const { version } = require('../package.json');
 const { mergePrompt } = require('./merge');
 const { subtitlePrompt } = require('./subtitle');
 const { waitForInput } = require('./utils');
@@ -19,7 +20,7 @@ const { waitForInput } = require('./utils');
     let stillUsing = true;
     while (stillUsing) {
         console.log(separator);
-        console.log('MKV-Handler');
+        console.log(`MKV-Handler v${version}`);
         console.log(separator);
 
         const response = await waitForInput(mainMenu); 
