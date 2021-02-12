@@ -51,9 +51,13 @@ const renameSubtitles = async () => {
     console.log(subtitleProposals);
     const approval = await waitForInput('Is the above set of changes valid? (y || n): ');
     if (approval.toLowerCase() === 'y') {
-        subtitleProposals.map((proposal) => {
-            execWrapper(`mv -f "${proposal.subtitle}" "${proposal.proposedPath}"`);
-        })
+        const renamePromises = subtitleProposals.map((proposal) => {
+            return new Promise(() => {
+                execWrapper(`mv -f "${proposal.subtitle}" "${proposal.proposedPath}"`);
+            });
+        });
+        
+        await Promise.allSettled(renamePromises);
     } else {
         console.log('Cancelling...');
         return;
