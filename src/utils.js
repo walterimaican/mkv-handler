@@ -1,5 +1,7 @@
+const checkUpdate = require('check-update-github');
 const { exec } = require('child_process');
 const readline = require('readline');
+const package = require('../package.json')
 
 const waitForInput = async (query) => {
     const readlineInterface = readline.createInterface({
@@ -44,7 +46,7 @@ const execWrapper = async (script) => {
 
 const sanitize = (givenString) => {
     return givenString.replace(/"/g, '');
-}
+};
 
 const templateHelper = async (template) => {
     // show_ep_01_credits.mkv
@@ -69,6 +71,20 @@ const templateHelper = async (template) => {
         .replace(/\)/g, '\\)');
     const templateRE = new RegExp(templateREstring);
     return { templateSplit, templateRE };
-}
+};
 
-module.exports = { waitForInput, execWrapper, sanitize, templateHelper };
+const getLatestVersion = async () => {
+    return new Promise((resolve, reject) => {
+        checkUpdate({
+            name: package.name,
+            currentVersion: package.version,
+            user: 'walterimaican',
+            branch: 'main',
+        }, (error, latestVersion) => {
+            if (error) reject(error)
+            resolve(latestVersion);
+        });
+    });
+};
+
+module.exports = { waitForInput, execWrapper, sanitize, templateHelper, getLatestVersion };

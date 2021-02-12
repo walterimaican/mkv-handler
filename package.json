@@ -1,10 +1,10 @@
 {
   "name": "mkv-handler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node --trace-warnings src/index.js",
     "clean": "rm -f *.exe",
     "pkg": "npm run clean && pkg -o mkvhandler.exe -t node14-win-x64 src/index.js"
   },
@@ -18,7 +18,9 @@
     "url": "https://github.com/walterimaican/mkv-handler/issues"
   },
   "homepage": "https://github.com/walterimaican/mkv-handler#readme",
+  "releases": "https://github.com/walterimaican/mkv-handler/releases",
   "dependencies": {
+    "check-update-github": "0.0.4",
     "pkg": "^4.4.9",
     "readline": "^1.3.0",
     "subshift": "^2.0.1"

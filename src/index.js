@@ -1,7 +1,7 @@
-const { version } = require('../package.json');
+const { version, releases } = require('../package.json');
 const { mergePrompt } = require('./merge');
 const { subtitlePrompt } = require('./subtitle');
-const { waitForInput } = require('./utils');
+const { waitForInput, getLatestVersion } = require('./utils');
 
 (async () => {
     const separator = '========================================';
@@ -17,10 +17,17 @@ const { waitForInput } = require('./utils');
     + quit
     + '> ';
 
+    let versionMessage = null;
+    const latestVersion = await getLatestVersion();
+    if (latestVersion > version) {
+        versionMessage = `\nv${latestVersion} available at ${releases}\n`;
+    }
+
     let stillUsing = true;
     while (stillUsing) {
         console.log(separator);
         console.log(`MKV-Handler v${version}`);
+        if (versionMessage) console.log(versionMessage);
         console.log(separator);
 
         const response = await waitForInput(mainMenu); 
