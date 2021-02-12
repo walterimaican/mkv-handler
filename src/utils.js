@@ -42,4 +42,8 @@ const execWrapper = async (script) => {
     return returnStatus;
 };
 
-module.exports = { waitForInput, execWrapper };
+const sanitize = (givenString) => {
+    return givenString.replace(/"/g, '');
+}
+
+module.exports = { waitForInput, execWrapper, sanitize };

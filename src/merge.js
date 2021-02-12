@@ -1,12 +1,12 @@
 const path = require('path');
-const { waitForInput, execWrapper } = require('./utils');
+const { waitForInput, execWrapper, sanitize } = require('./utils');
 
 // Need subtitleFile and inputFile; subtitleLanguage and outputFile are optional
 const mergeSingleSubtitle = async ({ inputFile, outputFile, subtitleFile, subtitleLanguage}) => {
     // Sanitize
-    inputFile = inputFile.replace(/"/g, '');
-    outputFile = outputFile.replace(/"/g, '');
-    subtitleFile = subtitleFile.replace(/"/g, '');
+    inputFile = sanitize(inputFile);
+    outputFile = sanitize(outputFile);
+    subtitleFile = sanitize(subtitleFile);
 
     // If no outputFile provided, overwrite inputFile
     const shouldOverwrite = outputFile.length === 0 ? true : false;
