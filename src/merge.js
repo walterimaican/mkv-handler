@@ -56,18 +56,23 @@ const mergeMultipleSubtitles = async () => {
     console.log(proposals);
     const approval = await waitForInput('Is the above set of videos and subtitles valid? (y || n): ');
     if (approval.toLowerCase() === 'y') {
-        const mergePromises = proposals.map((proposal) => {
-            return new Promise(() => { 
-                mergeSingleSubtitle({ 
-                    inputFile: proposal.video, 
-                    outputFile, 
-                    subtitleFile: proposal.subtitle, 
-                    subtitleLanguage,
-                });
-            });
-        });
+        await proposals.reduce(
+            async (promise, proposal) => {
+                await promise;
 
-        await Promise.allSettled(mergePromises);
+                return new Promise((resolve) => {
+                    mergeSingleSubtitle({
+                        inputFile: proposal.video,
+                        outputFile,
+                        subtitleFile: proposal.subtitle,
+                        subtitleLanguage,
+                    }).then(() => {
+                        resolve(true);
+                    });
+                });
+            }, 
+            Promise.resolve(true)
+        );
     } else {
         console.log('Cancelling...');
         return;
