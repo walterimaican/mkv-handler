@@ -1,5 +1,6 @@
+const fs = require('fs');
 const path = require('path');
-const { waitForInput, execWrapper, sanitize } = require('./utils');
+const { waitForInput, execWrapper, sanitize, templateHelper } = require('./utils');
 
 // Need subtitleFile and inputFile; subtitleLanguage and outputFile are optional
 const mergeSingleSubtitle = async ({ inputFile, outputFile, subtitleFile, subtitleLanguage}) => {
@@ -28,7 +29,50 @@ const mergeSingleSubtitle = async ({ inputFile, outputFile, subtitleFile, subtit
     }
 };
 
-const mergeMultipleSubtitles = async () => {};
+const mergeMultipleSubtitles = async () => {
+    console.log('Subtitles must have the same name and be in the same directory as the MKV they are merging with\n(eg. folder\\myVideo.mkv, folder\\myVideo.srt)');
+    await waitForInput('Press [ENTER] when ready.\n');
+
+    const templateQuery = 'Path of MKV to merge, with episode identifier: ?\n(eg. E:\\Desktop\\show_ep_01.mkv -> E:\\Desktop\\show_ep_?.mkv)\n> ';
+    const templateFile = sanitize(await waitForInput(templateQuery));
+    const directory = path.dirname(templateFile);
+    const baseVideo = path.basename(templateFile);
+    const templateResults = await templateHelper(baseVideo);
+    if (!templateResults) return;
+
+    let subtitleExt = await waitForInput('Subtitle extension (Default: .srt): ');
+    if (subtitleExt.length === 0) subtitleExt = '.srt';
+
+    let proposals = [];
+    const videos = fs.readdirSync(directory).filter((file) => templateResults.templateRE.test(file));
+    videos.forEach((video) => {
+        const subtitle = video.replace('.mkv', subtitleExt);
+        proposals.push({ video: path.join(directory, video), subtitle: path.join(directory, subtitle) });
+    });
+
+    const subtitleLanguage = await waitForInput('Optional subtitle language (eg. jpn | Provide none for unlabeled track): ');
+    const outputFile = await waitForInput('Path of output MKV (eg. E:\\Desktop\\myNewMKV.mkv | Provide none to overwrite input MKV): ');
+
+    console.log(proposals);
+    const approval = await waitForInput('Is the above set of videos and subtitles valid? (y || n): ');
+    if (approval.toLowerCase() === 'y') {
+        const mergePromises = proposals.map((proposal) => {
+            return new Promise(() => { 
+                mergeSingleSubtitle({ 
+                    inputFile: proposal.video, 
+                    outputFile, 
+                    subtitleFile: proposal.subtitle, 
+                    subtitleLanguage,
+                });
+            });
+        });
+
+        await Promise.allSettled(mergePromises);
+    } else {
+        console.log('Cancelling...');
+        return;
+    }
+};
 
 const mergeSubtitles = async () => {
     const singleMultiResponse = await waitForInput('Merge subtitles for a single file or multiple files? (s || m): ');
