@@ -54,24 +54,21 @@ const templateHelper = async (template) => {
     }
 
     let templateSplit = template.split('?');
-    templateSplit = templateSplit.filter(slice => slice.length > 0);
 
-    // show_??_??_credits.mkv
+    // show_?_?_credits.mkv
     if (templateSplit.length > 2) {
-        console.error('More than one grouping of "?"s provided, exiting...');
+        console.error('More than one "?" provided, exiting...');
         return null;
     }
 
-    // ??_show_ep_01_credits.mkv
-    // show_ep_01_credits.mkv??
-    let identifierLocation = 'middle';
-    if (templateSplit.length === 1 && template[0] === '?') {
-        identifierLocation = 'start';
-    } else if (templateSplit.length === 1 && template[template.length - 1] === '?') {
-        identifierLocation = 'end';
-    }
-    
-    return { templateSplit, identifierLocation };
+    const templateREstring = template
+        .replace('?', '.*')
+        .replace(/\[/g, '\\[')    
+        .replace(/\]/g, '\\]')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)');
+    const templateRE = new RegExp(templateREstring);
+    return { templateSplit, templateRE };
 }
 
 module.exports = { waitForInput, execWrapper, sanitize, templateHelper };

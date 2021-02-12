@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const { waitForInput, execWrapper, sanitize, templateHelper } = require('./utils');
 
@@ -17,19 +18,46 @@ const shiftSubtitles = async () => {
 const renameSubtitles = async () => {
     console.log('Renaming batch of subtitles based off of corresponding video files.\n');
 
-    const videoTemplateQuery = 'Path of video used as template for renaming, with episode identifier: ?\n(eg. E:\\Desktop\\show_ep_01.mkv -> E:\\Desktop\\show_ep_??.mkv)\n> ';
+    const videoTemplateQuery = 'Path of video used as template for renaming, with episode identifier: ?\n(eg. E:\\Desktop\\show_ep_01.mkv -> E:\\Desktop\\show_ep_?.mkv)\n> ';
     const videoTemplatePath = sanitize(await waitForInput(videoTemplateQuery));
-    const videoTemplateResults = await templateHelper(path.basename(videoTemplatePath));
+    const videoBase = path.basename(videoTemplatePath);
+    const videoExt = path.extname(videoTemplatePath);
+    const videoTemplateResults = await templateHelper(videoBase);
     if (!videoTemplateResults) return;
     
-    const subtitleTemplateQuery = 'Path of subtitle whose name will be overwritten, with episode identifier: ?\n(eg. E:\\Desktop\\my_sub_01.srt -> E:\\Desktop\\my_sub_??.mkv)\n> ';
+    const subtitleTemplateQuery = 'Path of subtitle whose name will be overwritten, with episode identifier: ?\n(eg. E:\\Desktop\\my_sub_01.srt -> E:\\Desktop\\my_sub_?.mkv)\n> ';
     const subtitleTemplatePath = sanitize(await waitForInput(subtitleTemplateQuery));
-    const subtitleTemplateResults = await templateHelper(path.basename(subtitleTemplatePath));
+    const subtitleDir = path.dirname(subtitleTemplatePath);
+    const subtitleBase = path.basename(subtitleTemplatePath);
+    const subtitleExt = path.extname(subtitleTemplatePath);
+    const subtitleTemplateResults = await templateHelper(subtitleBase);
     if (!subtitleTemplateResults) return;
 
+    const subtitles = fs.readdirSync(subtitleDir).filter((file) => subtitleTemplateResults.templateRE.test(file));
+    let subtitleProposals = [];
 
+    subtitles.map((subtitle) => {
+        let parsedSegments = subtitle;
+        subtitleTemplateResults.templateSplit.forEach((segment) => {
+            parsedSegments = parsedSegments.split(segment).filter((segment) => segment.length > 0)[0];
+        });
 
-    // get array of before - after subtitle file name change and print and confirm w/user before renaming
+        const episode = parsedSegments;
+        const newName = videoBase.replace('?', episode).replace(videoExt, subtitleExt);
+        const proposedPath = path.join(subtitleDir, newName);
+        subtitleProposals.push({ subtitle: path.join(subtitleDir, subtitle), proposedPath });
+    });
+
+    console.log(subtitleProposals);
+    const approval = await waitForInput('Is the above set of changes valid? (y || n): ');
+    if (approval.toLowerCase() === 'y') {
+        subtitleProposals.map((proposal) => {
+            execWrapper(`mv -f "${proposal.subtitle}" "${proposal.proposedPath}"`);
+        })
+    } else {
+        console.log('Cancelling...');
+        return;
+    }
 }
 
 const subtitlePrompt = async () => {
