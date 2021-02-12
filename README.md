@@ -6,7 +6,11 @@ I am adding functionality to it as needed. As a result, this program is far from
 
 # How to Use
 
-This program currently calls various MKVToolNix executables (which means that you need to have these programs already available in your PATH).
+This program currently calls various MKVToolNix executables (which means that you need to have these programs already available in your PATH). You will also need to have `subshift` available from the command line as well by running:
+
+```
+npm i -g subshift
+```
 
 ## Windows 64-bit Users
 
